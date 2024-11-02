@@ -17,6 +17,9 @@ import { UUIDType } from './types/uuid.js';
 import { CreatePostInput } from './types/CreatePostInput.js';
 import { CreateUserInput } from './types/CreateUserInput.js';
 import { CreateProfileInput } from './types/CreateProfileInput.js';
+import { ChangePostInput } from './types/ChangePostInput.js';
+import { ChangeUserInput } from './types/ChangeUserInput.js';
+import { ChangeProfileInput } from './types/ChangeProfileInput.js';
 
 const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
   const { prisma } = fastify;
@@ -158,23 +161,23 @@ const schema = new GraphQLSchema({
           await prisma.post.delete({ where: { id } });
         },
       },
-      // changePost: {
-      //   type: Post,
-      //   args: {
-      //     id: { type: UUIDType },
-      //     dto: { type: CreatePostInput },
-      //   },
-      //   resolve: async function (
-      //     _,
-      //     {
-      //       dto,
-      //       id,
-      //     }: { dto: { title: string; content: string; authorId: string }; id: string },
-      //     { prisma }: { prisma: PrismaClient },
-      //   ) {
-      //     return prisma.post.update({ data: dto, where: { id } });
-      //   },
-      // },
+      changePost: {
+        type: Post,
+        args: {
+          id: { type: UUIDType },
+          dto: { type: ChangePostInput },
+        },
+        resolve: async function (
+          _,
+          {
+            dto,
+            id,
+          }: { dto: { title: string; content: string; authorId: string }; id: string },
+          { prisma }: { prisma: PrismaClient },
+        ) {
+          return prisma.post.update({ data: dto, where: { id } });
+        },
+      },
       createUser: {
         type: User,
         args: {
@@ -201,20 +204,20 @@ const schema = new GraphQLSchema({
           await prisma.user.delete({ where: { id } });
         },
       },
-      // changeUser: {
-      //   type: User,
-      //   args: {
-      //     id: { type: UUIDType },
-      //     dto: { type: CreateUserInput },
-      //   },
-      //   resolve: async function (
-      //     _,
-      //     { dto, id }: { dto: { name: string; balance: number }; id: string },
-      //     { prisma }: { prisma: PrismaClient },
-      //   ) {
-      //     return prisma.user.update({ data: dto, where: { id } });
-      //   },
-      // },
+      changeUser: {
+        type: User,
+        args: {
+          id: { type: UUIDType },
+          dto: { type: ChangeUserInput },
+        },
+        resolve: async function (
+          _,
+          { dto, id }: { dto: { name: string; balance: number }; id: string },
+          { prisma }: { prisma: PrismaClient },
+        ) {
+          return prisma.user.update({ data: dto, where: { id } });
+        },
+      },
       createProfile: {
         type: Profile,
         args: {
@@ -250,31 +253,31 @@ const schema = new GraphQLSchema({
           await prisma.profile.delete({ where: { id } });
         },
       },
-      // changeProfile: {
-      //   type: Profile,
-      //   args: {
-      //     id: { type: UUIDType },
-      //     dto: { type: CreateProfileInput },
-      //   },
-      //   resolve: async function (
-      //     _,
-      //     {
-      //       dto,
-      //       id,
-      //     }: {
-      //       dto: {
-      //         isMale: boolean;
-      //         yearOfBirth: number;
-      //         userId: string;
-      //         memberTypeId: string;
-      //       };
-      //       id: string;
-      //     },
-      //     { prisma }: { prisma: PrismaClient },
-      //   ) {
-      //     return prisma.profile.update({ data: dto, where: { id } });
-      //   },
-      // },
+      changeProfile: {
+        type: Profile,
+        args: {
+          id: { type: UUIDType },
+          dto: { type: ChangeProfileInput },
+        },
+        resolve: async function (
+          _,
+          {
+            dto,
+            id,
+          }: {
+            dto: {
+              isMale: boolean;
+              yearOfBirth: number;
+              userId: string;
+              memberTypeId: string;
+            };
+            id: string;
+          },
+          { prisma }: { prisma: PrismaClient },
+        ) {
+          return prisma.profile.update({ data: dto, where: { id } });
+        },
+      },
     },
   }),
 });
