@@ -6,8 +6,11 @@ import {
   GraphQLList,
   GraphQLObjectType,
   GraphQLSchema,
+  validate,
+  parse,
 } from 'graphql';
 import { PrismaClient } from '@prisma/client';
+import depthLimit from 'graphql-depth-limit';
 
 import { MemberTypeId, MemberType } from './schemas/MemberType.js';
 import { Post } from './schemas/Post.js';
@@ -35,6 +38,11 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
     },
     async handler(req) {
       const { query, variables } = req.body;
+      const errors = validate(schema, parse(query), [depthLimit(5)]);
+      if (errors.length > 0) {
+        return { errors };
+      }
+
       return graphql({
         schema,
         source: query,
