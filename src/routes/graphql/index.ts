@@ -8,6 +8,9 @@ import { Post } from './schemas/Post.js';
 import { Profile } from './schemas/Profile.js';
 import { User } from './schemas/User.js';
 import { UUIDType } from './types/uuid.js';
+import { CreatePostInput } from './types/CreatePostInput.js';
+import { CreateUserInput } from './types/CreateUserInput.js';
+import { CreateProfileInput } from './types/CreateProfileInput.js';
 
 const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
   const { prisma } = fastify;
@@ -35,7 +38,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
 
 const schema = new GraphQLSchema({
   query: new GraphQLObjectType({
-    name: 'BasicSchema',
+    name: 'Queries',
     fields: {
       memberTypes: {
         type: new GraphQLList(MemberType),
@@ -116,6 +119,59 @@ const schema = new GraphQLSchema({
           { prisma }: { prisma: PrismaClient },
         ) {
           return prisma.profile.findUnique({ where: { id } });
+        },
+      },
+    },
+  }),
+  mutation: new GraphQLObjectType({
+    name: 'Mutations',
+    fields: {
+      createPost: {
+        type: Post,
+        args: {
+          dto: { type: CreatePostInput },
+        },
+        resolve: async function (
+          _,
+          { dto }: { dto: { title: string; content: string; authorId: string } },
+          { prisma }: { prisma: PrismaClient },
+        ) {
+          return prisma.post.create({ data: dto });
+        },
+      },
+      createUser: {
+        type: User,
+        args: {
+          dto: { type: CreateUserInput },
+        },
+        resolve: async function (
+          _,
+          { dto }: { dto: { name: string; balance: number } },
+          { prisma }: { prisma: PrismaClient },
+        ) {
+          return prisma.user.create({ data: dto });
+        },
+      },
+      createProfile: {
+        type: Profile,
+        args: {
+          dto: { type: CreateProfileInput },
+        },
+        resolve: async function (
+          _,
+          {
+            dto,
+          }: {
+            dto: {
+              isMale: boolean;
+              yearOfBirth: number;
+              userId: string;
+              memberTypeId: string;
+            };
+          },
+          { prisma }: { prisma: PrismaClient },
+        ) {
+          return prisma.profile.create({ data: dto });
         },
       },
     },
