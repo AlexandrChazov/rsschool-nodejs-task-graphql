@@ -1,13 +1,14 @@
-import { GraphQLFloat, GraphQLObjectType, GraphQLString } from 'graphql';
+import { GraphQLFloat, GraphQLObjectType } from 'graphql';
+import { UUIDType } from '../types/uuid.js';
 
 export const User = new GraphQLObjectType({
   name: 'User',
   fields: {
     id: {
-      type: GraphQLString,
+      type: UUIDType,
     },
     name: {
-      type: GraphQLString,
+      type: UUIDType,
     },
     balance: {
       type: GraphQLFloat,
