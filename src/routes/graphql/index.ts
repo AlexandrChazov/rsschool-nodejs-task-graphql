@@ -1,6 +1,12 @@
 import { FastifyPluginAsyncTypebox } from '@fastify/type-provider-typebox';
 import { createGqlResponseSchema, gqlResponseSchema } from './schemas.js';
-import { graphql, GraphQLList, GraphQLObjectType, GraphQLSchema } from 'graphql';
+import {
+  graphql,
+  GraphQLBoolean,
+  GraphQLList,
+  GraphQLObjectType,
+  GraphQLSchema,
+} from 'graphql';
 import { PrismaClient } from '@prisma/client';
 
 import { MemberTypeId, MemberType } from './schemas/MemberType.js';
@@ -139,6 +145,36 @@ const schema = new GraphQLSchema({
           return prisma.post.create({ data: dto });
         },
       },
+      deletePost: {
+        type: GraphQLBoolean,
+        args: {
+          id: { type: UUIDType },
+        },
+        resolve: async function (
+          _,
+          { id }: { id: string },
+          { prisma }: { prisma: PrismaClient },
+        ) {
+          await prisma.post.delete({ where: { id } });
+        },
+      },
+      // changePost: {
+      //   type: Post,
+      //   args: {
+      //     id: { type: UUIDType },
+      //     dto: { type: CreatePostInput },
+      //   },
+      //   resolve: async function (
+      //     _,
+      //     {
+      //       dto,
+      //       id,
+      //     }: { dto: { title: string; content: string; authorId: string }; id: string },
+      //     { prisma }: { prisma: PrismaClient },
+      //   ) {
+      //     return prisma.post.update({ data: dto, where: { id } });
+      //   },
+      // },
       createUser: {
         type: User,
         args: {
@@ -152,6 +188,33 @@ const schema = new GraphQLSchema({
           return prisma.user.create({ data: dto });
         },
       },
+      deleteUser: {
+        type: GraphQLBoolean,
+        args: {
+          id: { type: UUIDType },
+        },
+        resolve: async function (
+          _,
+          { id }: { id: string },
+          { prisma }: { prisma: PrismaClient },
+        ) {
+          await prisma.user.delete({ where: { id } });
+        },
+      },
+      // changeUser: {
+      //   type: User,
+      //   args: {
+      //     id: { type: UUIDType },
+      //     dto: { type: CreateUserInput },
+      //   },
+      //   resolve: async function (
+      //     _,
+      //     { dto, id }: { dto: { name: string; balance: number }; id: string },
+      //     { prisma }: { prisma: PrismaClient },
+      //   ) {
+      //     return prisma.user.update({ data: dto, where: { id } });
+      //   },
+      // },
       createProfile: {
         type: Profile,
         args: {
@@ -174,6 +237,44 @@ const schema = new GraphQLSchema({
           return prisma.profile.create({ data: dto });
         },
       },
+      deleteProfile: {
+        type: GraphQLBoolean,
+        args: {
+          id: { type: UUIDType },
+        },
+        resolve: async function (
+          _,
+          { id }: { id: string },
+          { prisma }: { prisma: PrismaClient },
+        ) {
+          await prisma.profile.delete({ where: { id } });
+        },
+      },
+      // changeProfile: {
+      //   type: Profile,
+      //   args: {
+      //     id: { type: UUIDType },
+      //     dto: { type: CreateProfileInput },
+      //   },
+      //   resolve: async function (
+      //     _,
+      //     {
+      //       dto,
+      //       id,
+      //     }: {
+      //       dto: {
+      //         isMale: boolean;
+      //         yearOfBirth: number;
+      //         userId: string;
+      //         memberTypeId: string;
+      //       };
+      //       id: string;
+      //     },
+      //     { prisma }: { prisma: PrismaClient },
+      //   ) {
+      //     return prisma.profile.update({ data: dto, where: { id } });
+      //   },
+      // },
     },
   }),
 });
