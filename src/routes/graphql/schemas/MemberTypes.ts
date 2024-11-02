@@ -1,16 +1,14 @@
 import { GraphQLEnumType, GraphQLObjectType, GraphQLString } from 'graphql/index.js';
 
-const MemberTypeId = new GraphQLEnumType({
+export const MemberTypeId = new GraphQLEnumType({
+  // это имя указывается в запросе как тип переменной - $memberTypeId: MemberTypeId!
   name: 'MemberTypeId',
-  description: 'BASIC | BUSINESS',
   values: {
     BASIC: {
-      value: 0,
-      description: 'BASIC',
+      value: 'BASIC',
     },
     BUSINESS: {
-      value: 1,
-      description: 'BUSINESS',
+      value: 'BUSINESS',
     },
   },
 });
@@ -19,7 +17,7 @@ export const MemberTypes = new GraphQLObjectType({
   name: 'memberType',
   fields: {
     id: {
-      type: GraphQLString,
+      type: MemberTypeId,
     },
     discount: {
       type: GraphQLString,
