@@ -218,6 +218,46 @@ const schema = new GraphQLSchema({
           return prisma.user.update({ data: dto, where: { id } });
         },
       },
+      subscribeTo: {
+        type: GraphQLBoolean,
+        args: {
+          userId: { type: UUIDType },
+          authorId: { type: UUIDType },
+        },
+        resolve: async function (
+          _,
+          { userId, authorId }: { userId: string; authorId: string },
+          { prisma }: { prisma: PrismaClient },
+        ) {
+          await prisma.subscribersOnAuthors.create({
+            data: {
+              subscriberId: userId,
+              authorId,
+            },
+          });
+        },
+      },
+      unsubscribeFrom: {
+        type: GraphQLBoolean,
+        args: {
+          userId: { type: UUIDType },
+          authorId: { type: UUIDType },
+        },
+        resolve: async function (
+          _,
+          { userId, authorId }: { userId: string; authorId: string },
+          { prisma }: { prisma: PrismaClient },
+        ) {
+          await prisma.subscribersOnAuthors.delete({
+            where: {
+              subscriberId_authorId: {
+                subscriberId: userId,
+                authorId,
+              },
+            },
+          });
+        },
+      },
       createProfile: {
         type: Profile,
         args: {
