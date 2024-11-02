@@ -13,7 +13,7 @@ export const MemberTypeId = new GraphQLEnumType({
   },
 });
 
-export const MemberTypes = new GraphQLObjectType({
+export const MemberType = new GraphQLObjectType({
   name: 'memberType',
   fields: {
     id: {

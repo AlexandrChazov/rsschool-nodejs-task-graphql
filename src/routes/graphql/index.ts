@@ -3,10 +3,10 @@ import { createGqlResponseSchema, gqlResponseSchema } from './schemas.js';
 import { graphql, GraphQLList, GraphQLObjectType, GraphQLSchema } from 'graphql';
 import { PrismaClient } from '@prisma/client';
 
-import { MemberTypeId, MemberTypes } from './schemas/MemberTypes.js';
-import { Posts } from './schemas/Posts.js';
-import { Profiles } from './schemas/Profiles.js';
-import { Users } from './schemas/Users.js';
+import { MemberTypeId, MemberType } from './schemas/MemberType.js';
+import { Post } from './schemas/Post.js';
+import { Profile } from './schemas/Profile.js';
+import { User } from './schemas/User.js';
 import { UUIDType } from './types/uuid.js';
 
 const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
@@ -38,13 +38,13 @@ const schema = new GraphQLSchema({
     name: 'BasicSchema',
     fields: {
       memberTypes: {
-        type: new GraphQLList(MemberTypes),
+        type: new GraphQLList(MemberType),
         resolve: async function (_a, _b, { prisma }: { prisma: PrismaClient }) {
           return prisma.memberType.findMany();
         },
       },
       memberType: {
-        type: MemberTypes,
+        type: MemberType,
         args: {
           id: { type: MemberTypeId },
         },
@@ -57,13 +57,13 @@ const schema = new GraphQLSchema({
         },
       },
       posts: {
-        type: new GraphQLList(Posts),
+        type: new GraphQLList(Post),
         resolve: async function (_a, _b, { prisma }: { prisma: PrismaClient }) {
           return prisma.post.findMany();
         },
       },
       post: {
-        type: Posts,
+        type: Post,
         args: {
           id: { type: UUIDType },
         },
@@ -76,13 +76,13 @@ const schema = new GraphQLSchema({
         },
       },
       users: {
-        type: new GraphQLList(Users),
+        type: new GraphQLList(User),
         resolve: async function (_a, _b, { prisma }: { prisma: PrismaClient }) {
           return prisma.user.findMany();
         },
       },
       user: {
-        type: Users,
+        type: User,
         args: {
           id: { type: UUIDType },
         },
@@ -95,13 +95,13 @@ const schema = new GraphQLSchema({
         },
       },
       profiles: {
-        type: new GraphQLList(Profiles),
+        type: new GraphQLList(Profile),
         resolve: async function (_a, _b, { prisma }: { prisma: PrismaClient }) {
           return prisma.profile.findMany();
         },
       },
       profile: {
-        type: Profiles,
+        type: Profile,
         args: {
           id: { type: UUIDType },
         },
