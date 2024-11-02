@@ -78,7 +78,9 @@ const schema = new GraphQLSchema({
       users: {
         type: new GraphQLList(User),
         resolve: async function (_a, _b, { prisma }: { prisma: PrismaClient }) {
-          return prisma.user.findMany();
+          return prisma.user.findMany({
+            include: { profile: { include: { memberType: true } }, posts: true },
+          });
         },
       },
       user: {
@@ -91,7 +93,10 @@ const schema = new GraphQLSchema({
           { id }: { id: string },
           { prisma }: { prisma: PrismaClient },
         ) {
-          return prisma.user.findUnique({ where: { id } });
+          return prisma.user.findUnique({
+            where: { id },
+            include: { profile: { include: { memberType: true } }, posts: true },
+          });
         },
       },
       profiles: {
