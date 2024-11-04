@@ -9,7 +9,13 @@ import {
   validate,
   parse,
 } from 'graphql';
-import { PrismaClient } from '@prisma/client';
+import {
+  PrismaClient,
+  User as UserModel,
+  Post as PostModel,
+  Profile as ProfileModel,
+  MemberType as MemberTypeModel,
+} from '@prisma/client';
 import depthLimit from 'graphql-depth-limit';
 
 import { MemberTypeId, MemberType } from './schemas/MemberType.js';
@@ -23,6 +29,11 @@ import { CreateProfileInput } from './types/CreateProfileInput.js';
 import { ChangePostInput } from './types/ChangePostInput.js';
 import { ChangeUserInput } from './types/ChangeUserInput.js';
 import { ChangeProfileInput } from './types/ChangeProfileInput.js';
+import DataLoader from 'dataloader';
+import { userLoader } from './loaders/userLoader.js';
+import { profileIdLoader, profileLoader } from './loaders/profileLoader.js';
+import { postLoader, postsLoader } from './loaders/postLoader.js';
+import { memberTypeLoader, memberTypesLoader } from './loaders/memberTypeLoader.js';
 
 const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
   const { prisma } = fastify;
@@ -47,7 +58,16 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
         schema,
         source: query,
         variableValues: variables,
-        contextValue: { prisma },
+        contextValue: {
+          memberTypeLoader: memberTypeLoader(prisma),
+          memberTypesLoader: memberTypesLoader(prisma),
+          postLoader: postLoader(prisma),
+          postsLoader: postsLoader(prisma),
+          profileLoader: profileLoader(prisma),
+          profileIdLoader: profileIdLoader(prisma),
+          userLoader: userLoader(prisma),
+          prisma,
+        },
       });
     },
   });
@@ -68,12 +88,15 @@ const schema = new GraphQLSchema({
         args: {
           id: { type: MemberTypeId },
         },
-        resolve: async function (
+        //@ts-ignore
+        resolve: async (
           _,
           { id }: { id: string },
-          { prisma }: { prisma: PrismaClient },
-        ) {
-          return prisma.memberType.findUnique({ where: { id } });
+          {
+            memberTypesLoader,
+          }: { memberTypesLoader: DataLoader<string, MemberTypeModel> },
+        ) => {
+          return await memberTypesLoader.load(id);
         },
       },
       posts: {
@@ -87,20 +110,19 @@ const schema = new GraphQLSchema({
         args: {
           id: { type: UUIDType },
         },
-        resolve: async function (
-          _a,
+        //@ts-ignore
+        resolve: async (
+          _,
           { id }: { id: string },
-          { prisma }: { prisma: PrismaClient },
-        ) {
-          return prisma.post.findUnique({ where: { id } });
+          { postLoader }: { postLoader: DataLoader<string, PostModel> },
+        ) => {
+          return await postLoader.load(id);
         },
       },
       users: {
         type: new GraphQLList(User),
         resolve: async function (_a, _b, { prisma }: { prisma: PrismaClient }) {
-          return prisma.user.findMany({
-            include: { profile: { include: { memberType: true } }, posts: true },
-          });
+          return prisma.user.findMany();
         },
       },
       user: {
@@ -108,15 +130,13 @@ const schema = new GraphQLSchema({
         args: {
           id: { type: UUIDType },
         },
-        resolve: async function (
-          _a,
+        //@ts-ignore
+        resolve: async (
+          _,
           { id }: { id: string },
-          { prisma }: { prisma: PrismaClient },
-        ) {
-          return prisma.user.findUnique({
-            where: { id },
-            include: { profile: { include: { memberType: true } }, posts: true },
-          });
+          { userLoader }: { userLoader: DataLoader<string, UserModel> },
+        ) => {
+          return await userLoader.load(id);
         },
       },
       profiles: {
@@ -130,12 +150,13 @@ const schema = new GraphQLSchema({
         args: {
           id: { type: UUIDType },
         },
-        resolve: async function (
-          _a,
+        //@ts-ignore
+        resolve: async (
+          _,
           { id }: { id: string },
-          { prisma }: { prisma: PrismaClient },
-        ) {
-          return prisma.profile.findUnique({ where: { id } });
+          { profileIdLoader }: { profileIdLoader: DataLoader<string, ProfileModel> },
+        ) => {
+          return await profileIdLoader.load(id);
         },
       },
     },

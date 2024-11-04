@@ -13,5 +13,8 @@ export const Post = new GraphQLObjectType({
     content: {
       type: UUIDType,
     },
+    authorId: {
+      type: UUIDType,
+    },
   },
 });
